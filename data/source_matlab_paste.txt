@@ -1,0 +1,292 @@
+%% 7.11.26 - 9 orthotropic constants & 3 CTEs, e.g., for modeling with embedding into organic core
+% =========================================================================
+% 3D COMPOSITE HOMONGENIZATION & MICROMECHANICS SOLVER (MATLAB)
+% Configuration: Symmetric Balanced 50/50 Cross-Ply Laminate
+% Coordinate System: Y-axis is the OUT-OF-PLANE thickness direction
+% =========================================================================
+clear; clc;
+% 0. Fiber & Matrix inputs
+% Ef=76; vf=0.21; af=5.6e-6; rof=2.55; % E-glass
+% Ef=86; vf=0.22; af=2.8e-6; rof=2.5; % S-glass with minumum CTE
+Ef=82; vf=0.22; af=2.49e-6; rof=2.5; % Adam's T+
+% Ef=82; vf=0.22; af=2.13e-6; rof=2.5; % Adam's T+3
+% Ef=83; vf=0.22; af=2.52e-6; rof=2.5; % Adam's T+4
+% Ef=80; vf=0.2; af=1.8e-6; rof=2.5; % GLW5
+% Ef=80; vf=0.2; af=2.4e-6; rof=2.5; % GLW6
+% Ef=70; vf=0.2; af=2e-6; rof=2.5; % Adam's competitor (VLEX?)
+% Ef=86; vf=0.2; af=2.5e-6; rof=2.5; % Adam's target 1
+% Ef=75; vf=0.2; af=1.1e-6; rof=2.5; % Adam's target 2
+Vf=0.42; Vm=1-Vf; % Fiber & Matrix Volume Fractions
+Ep=70; vp=0.17; ap=0.5e-6; rop=2.2; % Silica beads in matrix
+% Vfp=0.5; Vfr=1-Vfp; % Particles (Si beads) & Resin Volume Fractions
+% Er=3.5; vr=0.37; ar=55e-6; ror=1.2; % regular epoxy
+% Some other resin options from Gemini (~avg CTE used of the provided range)
+% Er=3; vr=0.37; ar=50e-6; ror=1.2; % Active Ester Modified Epoxy, MCL-E-795G(Type LH) likely use hybrid of this & CE
+% Er=3.3; vr=0.37; ar=47e-6; ror=1.2; % Cyanate Ester (CE)
+% Er=3.5; vr=0.37; ar=37e-6; ror=1.2; % Aromatic Polyimide (PI)
+% adjusting to match MCL-E-795G(Type LH)
+Vfp=0.7; Vfr=1-Vfp;
+Er=2.5; vr=0.37; ar=50e-6; ror=1.2;
+% 0.1. Calculate weight fraction of fiber
+w=Vfrof+VmVfprop+VmVfrror;
+Wf=Vfrof/w;
+% 1. Matrix properties calculation
+Em=Er(1+2(Ep/Er-1)/(Ep/Er+2)Vfp)/(1-(Ep/Er-1)/(Ep/Er+2)Vfp); % Halpin-Tsai
+vm=vpVfp+vrVfr;
+am=arVfr+apVfp+(ap-ar)VfpVfr(2(Ep(1-2vr)-Er(1-2vp))/(2ErVfr(1-2vp)+Ep(2Vfp(1-2vr)+1+vr))); % Kerner CTE
+% Em=7; vm=0.3; am=30e-6; % Matrix properties
+% 2. SINGLE-PLY (LAMINA) PROPERTY EXTRACTION
+% Longitudinal stiffness and major Poisson's ratio via rule of mixtures
+EL = Vf * Ef + Vm * Em;
+vLT = Vf * vf + Vm * vm;
+% Transverse modulus via Halpin-Tsai (circular fibers, geometry factor eta = 2)
+eta_E = ((Ef / Em) - 1) / ((Ef / Em) + 2);
+ET = Em * ((1 + 2 * eta_E * Vf) / (1 - eta_E * Vf));
+% Shear moduli via isotropic relations and Halpin-Tsai (geometry factor eta = 1)
+Gf = Ef / (2 * (1 + vf));
+Gm = Em / (2 * (1 + vm));
+eta_G = ((Gf / Gm) - 1) / ((Gf / Gm) + 1);
+GLT = Gm * ((1 + 1 * eta_G * Vf) / (1 - eta_G * Vf));
+% Transversely isotropic out-of-plane properties
+vTT_num = 1 + vm - vLT * (Em / EL);
+vTT_den = 1 - vm^2 + vm * vLT * (Em / EL);
+vTT = vf * Vf + vm * Vm * (vTT_num / vTT_den);
+GTT = ET / (2 * (1 + vTT));
+% Coefficients of Thermal Expansion via Schapery formulation
+a1 = (Vf * Ef * af + Vm * Em * am) / EL;
+a2 = af * Vf * (1 + vf) + am * Vm * (1 + vm) - a1 * vLT;
+% 3. BUILD THE 3D SINGLE-PLY COMPLIANCE MATRIX [S]
+% Stored in standard Voigt notation vector order: [11, 22, 33, 23, 13, 12]
+S_ply = zeros(6,6);
+S_ply(1,1) = 1 / EL;
+S_ply(2,2) = 1 / ET;
+S_ply(3,3) = 1 / ET;
+S_ply(1,2) = -vLT / EL; S_ply(2,1) = S_ply(1,2);
+S_ply(1,3) = -vLT / EL; S_ply(3,1) = S_ply(1,3);
+S_ply(2,3) = -vTT / ET; S_ply(3,2) = S_ply(2,3);
+S_ply(4,4) = 1 / GTT;
+S_ply(5,5) = 1 / GLT;
+S_ply(6,6) = 1 / GLT;
+% Structural ply local thermal expansion vector
+alpha_ply_local = [a1; a2; a2; 0; 0; 0];
+% 4. TENSOR ROTATION & STACK HOMOGENIZATION (3D)
+% Invert compliance to obtain local stiffness matrix
+C_ply = inv(S_ply);
+% Define a 3D coordinate transformation matrix for a 90-degree rotation
+% around the thickness axis (swapping axis 1 and 3 in standard system)
+C_0 = C_ply;
+C_90 = C_ply;
+% Swap the local longitudinal (1) and transverse in-plane (3) indices
+idx = [3, 2, 1, 6, 5, 4];
+C_90 = C_90(idx, idx);
+% Compute volumetric average for a balanced 50/50 layout
+C_laminate = 0.50 * C_0 + 0.50 * C_90;
+% Invert back to retrieve global macro-compliance fields
+S_lam = inv(C_laminate);
+% Average thermal vectors (In-plane components balance out)
+alpha_x_z = (a1 * EL + a2 * ET) / (EL + ET);
+% 5. FINAL MAPPING & EXTRACTION (Y IS THE OUT-OF-PLANE AXIS)
+% Re-map the compliance indices to fit your rotated frame where Y=thickness
+EX = 1 / S_lam(1,1);
+EY = 1 / S_lam(2,2); % Out-of-plane thickness axis
+EZ = 1 / S_lam(3,3);
+GXY = 1 / S_lam(6,6); % Interlaminar shear (X-Y plane) -> Now properly paired
+GYZ = 1 / S_lam(4,4); % Interlaminar shear (Y-Z plane) -> Now properly paired
+GXZ = 1 / S_lam(5,5); % In-plane shear modulus (X-Z plane) -> Stands alone as GLT
+NUXZ = -S_lam(1,3) / S_lam(1,1); % In-plane Poisson's ratio
+NUXY = -S_lam(1,2) / S_lam(1,1); % Major out-of-plane Poisson's ratio
+NUYZ = -S_lam(3,2) / S_lam(3,3); % Major out-of-plane Poisson's ratio
+ALPHAX = alpha_x_z;
+ALPHAZ = alpha_x_z;
+% Extract accurate thickness expansion from 3D state equations
+ALPHAY = a2 + (vTT + vLT) * (alpha_x_z - a1);
+% 6. PRINT RESULTS TO COMMAND WINDOW
+fprintf('Fiber weight fraction:
+');
+fprintf(' Wf = %.1f%%
+', Wf100);
+fprintf('Matrix material properties:
+');
+fprintf(' Em = %.2f GPa
+NU = %.2f
+CTE = %.2f ppm/°C
+', Em, vm, am1e6);
+fprintf('====================================================
+');
+fprintf(' ANSYS READY MACRO-LAMINATE CONSTANTS (Y=THICKNESS)
+');
+fprintf('====================================================
+');
+fprintf('Young''s Moduli (GPa):
+');
+fprintf(' EX = %.2f
+EY = %.2f
+EZ = %.2f
+', EX, EY, EZ);
+fprintf('Major Poisson''s Ratios:
+');
+fprintf(' NUXY = %.3f
+NUYZ = %.3f
+NUXZ = %.3f
+', NUXY, NUYZ, NUXZ);
+fprintf('Shear Moduli (GPa):
+');
+fprintf(' GXY = %.2f
+GYZ = %.2f
+GXZ = %.2f
+', GXY, GYZ, GXZ);
+fprintf('Thermal Expansion Coefficients (ppm/°C):
+');
+fprintf(' CTEX = %.2f
+CTEY = %.2f
+CTEZ = %.2f
+', ALPHAX1e6, ALPHAY1e6, ALPHAZ1e6);
+fprintf('====================================================
+');
+%% 9.13.26 - models
+clear
+clc
+Ep=70; vp=0.17; ap=0.5e-6; % Silica beads in matrix
+Vfp=0:0.05:0.7; Vfr=1-Vfp; % Particles (Si beads) & Resin Volume Fractions
+Er=3.5; vr=0.35; ar=50e-6; % resin
+Em_max=ErVfr+EpVfp;
+Em_min=(Vfr/Er+Vfp/Ep).^(-1);
+Em=Er(1+2(Ep/Er-1)/(Ep/Er+2)Vfp)./(1-(Ep/Er-1)/(Ep/Er+2)Vfp); % Halpin-Tsai
+am=arVfr+apVfp+(ap-ar).Vfp.Vfr.(2(Ep(1-2vr)-Er(1-2vp))./(2ErVfr(1-2vp)+Ep(2Vfp(1-2vr)+1+vr))); % Kerner CTE
+Ef=76; vf=0.21; af=5.2e-6; rof=2.55; % E-glass
+% Ef=87; vf=0.22; af=2.8e-6; rof=2.5; % S-glass with minumum CTE
+% figure % plot of models used for particulate composite
+% hold on
+% box
+% grid on
+% yyaxis left
+% plot(Vfp,Em_max,'o--','Linewidth',1,'DisplayName','Voigt E (upper bound)')
+% plot(Vfp,Em_min,'o:','Linewidth',1,'DisplayName','Reuss E (lower bound)')
+% plot(Vfp,Em,'o-','Linewidth',1,'DisplayName','Halpin-Tsai E')
+% ylabel('Elastic modulus, GPa')
+% yyaxis right
+% plot(Vfp,am1e6,'s--','Linewidth',1,'DisplayName','Kerner CTE')
+% xlabel('Filler volume fraction, vol%')
+% ylabel('CTE, ppm/C')
+% legend('Location','North')
+% subtitle('Resin + Filler properties')
+% xlim([0 max(Vfp)])
+%% 9.13.26 - parametric plots
+% 0. Fiber & Matrix inputs
+% Ef=76; vf=0.21; af=5.6e-6; rof=2.55; % E-glass
+Ef=87; vf=0.22; af=2.8e-6; rof=2.5; % S-glass with minumum CTE
+% Ef=80; vf=0.2; af=1.8e-6; rof=2.5; % GLW5
+% Ef=80; vf=0.2; af=2.4e-6; rof=2.5; % GLW6
+% Ef=86; vf=0.2; af=2.5e-6; rof=2.5; % Adam's target 1
+% Ef=75; vf=0.2; af=1.1e-6; rof=2.5; % Adam's target 2
+% Ef=70; vf=0.2; af=2e-6; rof=2.5; % Adam's competitor (VLEX?)
+Vf0=[0.4 0.5]; Vm0=1-Vf0; % Fiber & Matrix Volume Fractions
+for j=1:length(Vf0)
+Vf=Vf0(j); Vm=Vm0(j);
+Ep=70; vp=0.17; ap=0.5e-6; rop=2.2; % Silica beads in matrix
+Vfp0=0:0.05:0.7; Vfr0=1-Vfp0; % Particles (Si beads) & Resin Volume Fractions
+% Er=3.5; vr=0.37; ar=55e-6; ror=1.2; % regular epoxy
+% Some other resin options from Gemini (~avg CTE used of the provided range)
+Er=3; vr=0.37; ar=50e-6; ror=1.2; % Active Ester Modified Epoxy, MCL-E-795G(Type LH) likely use hybrid of this & CE
+% Er=3.3; vr=0.37; ar=47e-6; ror=1.2; % Cyanate Ester (CE)
+% Er=3.5; vr=0.37; ar=37e-6; ror=1.2; % Aromatic Polyimide (PI)
+% Er=3.5; vr=0.37; ar=20e-6; ror=1.2; % checking how low CTE should be to match Resonac
+for i=1:length(Vfp0)
+Vfp=Vfp0(i); Vfr=Vfr0(i);
+% 0.1. Calculate weight fraction of fiber
+w=Vfrof+VmVfprop+VmVfrror;
+Wf(j,i)=Vfrof/w;
+% 1. Matrix properties calculation
+Em=Er(1+2(Ep/Er-1)/(Ep/Er+2)Vfp)/(1-(Ep/Er-1)/(Ep/Er+2)Vfp); % Halpin-Tsai
+vm=vpVfp+vrVfr;
+am=arVfr+apVfp+(ap-ar)VfpVfr(2(Ep(1-2vr)-Er(1-2vp))/(2ErVfr(1-2vp)+Ep(2Vfp(1-2vr)+1+vr))); % Kerner CTE
+% Em=7; vm=0.3; am=30e-6; % Matrix CTE [/°C]
+% 2. SINGLE-PLY (LAMINA) PROPERTY EXTRACTION
+% Longitudinal stiffness and major Poisson's ratio via rule of mixtures
+EL = Vf * Ef + Vm * Em;
+vLT = Vf * vf + Vm * vm;
+% Transverse modulus via Halpin-Tsai (circular fibers, geometry factor eta = 2)
+eta_E = ((Ef / Em) - 1) / ((Ef / Em) + 2);
+ET = Em * ((1 + 2 * eta_E * Vf) / (1 - eta_E * Vf));
+% Shear moduli via isotropic relations and Halpin-Tsai (geometry factor eta = 1)
+Gf = Ef / (2 * (1 + vf));
+Gm = Em / (2 * (1 + vm));
+eta_G = ((Gf / Gm) - 1) / ((Gf / Gm) + 1);
+GLT = Gm * ((1 + 1 * eta_G * Vf) / (1 - eta_G * Vf));
+% Transversely isotropic out-of-plane properties
+vTT_num = 1 + vm - vLT * (Em / EL);
+vTT_den = 1 - vm^2 + vm * vLT * (Em / EL);
+vTT = vf * Vf + vm * Vm * (vTT_num / vTT_den);
+GTT = ET / (2 * (1 + vTT));
+% Coefficients of Thermal Expansion via Schapery formulation
+a1 = (Vf * Ef * af + Vm * Em * am) / EL;
+a2 = af * Vf * (1 + vf) + am * Vm * (1 + vm) - a1 * vLT;
+% 3. BUILD THE 3D SINGLE-PLY COMPLIANCE MATRIX [S]
+% Stored in standard Voigt notation vector order: [11, 22, 33, 23, 13, 12]
+S_ply = zeros(6,6);
+S_ply(1,1) = 1 / EL;
+S_ply(2,2) = 1 / ET;
+S_ply(3,3) = 1 / ET;
+S_ply(1,2) = -vLT / EL; S_ply(2,1) = S_ply(1,2);
+S_ply(1,3) = -vLT / EL; S_ply(3,1) = S_ply(1,3);
+S_ply(2,3) = -vTT / ET; S_ply(3,2) = S_ply(2,3);
+S_ply(4,4) = 1 / GTT;
+S_ply(5,5) = 1 / GLT;
+S_ply(6,6) = 1 / GLT;
+% Structural ply local thermal expansion vector
+alpha_ply_local = [a1; a2; a2; 0; 0; 0];
+% 4. TENSOR ROTATION & STACK HOMOGENIZATION (3D)
+% Invert compliance to obtain local stiffness matrix
+C_ply = inv(S_ply);
+% Define a 3D coordinate transformation matrix for a 90-degree rotation
+% around the thickness axis (swapping axis 1 and 3 in standard system)
+C_0 = C_ply;
+C_90 = C_ply;
+% Swap the local longitudinal (1) and transverse in-plane (3) indices
+idx = [3, 2, 1, 6, 5, 4];
+C_90 = C_90(idx, idx);
+% Compute volumetric average for a balanced 50/50 layout
+C_laminate = 0.50 * C_0 + 0.50 * C_90;
+% Invert back to retrieve global macro-compliance fields
+S_lam = inv(C_laminate);
+% Average thermal vectors (In-plane components balance out)
+alpha_x_z = (a1 * EL + a2 * ET) / (EL + ET);
+% 5. FINAL MAPPING & EXTRACTION (Y IS THE OUT-OF-PLANE AXIS)
+% Re-map the compliance indices to fit your rotated frame where Y=thickness
+EX(j,i) = 1 / S_lam(1,1);
+EY(j,i) = 1 / S_lam(2,2); % Out-of-plane thickness axis
+EZ(j,i) = 1 / S_lam(3,3);
+GXY(j,i) = 1 / S_lam(6,6); % Interlaminar shear (X-Y plane) -> Now properly paired
+GYZ(j,i) = 1 / S_lam(4,4); % Interlaminar shear (Y-Z plane) -> Now properly paired
+GXZ(j,i) = 1 / S_lam(5,5); % In-plane shear modulus (X-Z plane) -> Stands alone as GLT
+NUXZ(j,i) = -S_lam(1,3) / S_lam(1,1); % In-plane Poisson's ratio
+NUXY(j,i) = -S_lam(1,2) / S_lam(1,1); % Major out-of-plane Poisson's ratio
+NUYZ(j,i) = -S_lam(3,2) / S_lam(3,3); % Major out-of-plane Poisson's ratio
+ALPHAX(j,i) = alpha_x_z;
+ALPHAZ(j,i) = alpha_x_z;
+% Extract accurate thickness expansion from 3D state equations
+ALPHAY(j,i) = a2 + (vTT + vLT) * (alpha_x_z - a1);
+end
+end
+figure
+hold on
+box
+grid on
+yyaxis left
+plot(Vfp0,EX(1,:),'o-','Linewidth',1,'DisplayName',"In-plane modulus, Vf="+Vf0(1)+"")
+plot(Vfp0,EX(2,:),'o--','Linewidth',1,'DisplayName',"In-plane modulus, Vf="+Vf0(2)+"")
+% plot(Vfp,EY,'o:','Linewidth',1,'DisplayName','Out-of-plane modulus')
+% plot(Vfp,GXY,'o-','Linewidth',1,'DisplayName','Out-of-plane shear modulus')
+% plot(Vfp,GXZ,'o-','Linewidth',1,'DisplayName','In-plane shear modulus')
+ylabel('Elastic modulus, GPa')
+ylim([20 50])
+yyaxis right
+plot(Vfp0,ALPHAX(1,:)1e6,'s-','Linewidth',1,'DisplayName',"In-plane CTE, Vf="+Vf0(1)+"")
+plot(Vfp0,ALPHAX(2,:)1e6,'s--','Linewidth',1,'DisplayName',"In-plane CTE, Vf="+Vf0(2)+"")
+% plot(Vfp,ALPHAY1e6,'s--','Linewidth',1,'DisplayName','Out-of-plane CTE')
+xlabel('Filler volume fraction, vol%')
+ylabel('CTE, ppm/C')
+legend('Location','North')
+subtitle('Resin + Filler + Fiber (S-glass)')
+xlim([0 max(Vfp0)])
+ylim([6 15])

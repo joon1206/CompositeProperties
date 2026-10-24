@@ -1,0 +1,5 @@
+date,pass,query_family,source,outcome
+2026-10-24,broad_mapping,"glass fiber silica epoxy thermal expansion; layered thermoelastic homogenization",publisher search and Crossref,"Found direct hierarchical and exact-layer precedents"
+2026-10-24,adversarial,"3D sublaminate homogenization; glass fiber silica nanoparticles unit cell; FR4 multiscale CTE",publisher search,"Methodology and material combination both have prior work"
+2026-10-24,post_implementation,"Halpin Tsai Kerner high filler error; silica particle shape; random packing",publisher search,"High-loading deviations and morphology confound model-only conclusions"
+2026-10-24,pre_manuscript,"cross-ply thermal expansion invariant; exact layered thermal expansion; temperature dependent FR4",publisher search,"No defensible novelty claim from the current numerical result"

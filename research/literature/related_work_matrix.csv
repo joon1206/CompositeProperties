@@ -1,0 +1,9 @@
+work,material,method,validation,closest_relationship
+"Chen et al 2002",generic flat layers,exact thermoelastic interfaces,numerical examples,method already exists
+"Whitcomb and Noh 2000",3D sublaminates,exact layer homogenization,finite element,method already exists
+"2017 glass/polyimide/silica",fiber plus silica nanocomposite,unit-cell micromechanics,comparison with experiment,material combination already exists
+"Chaturvedi and Shen 1998",silica/epoxy encapsulant,particle unit cell and viscoelasticity,model comparisons,particle physics beyond our model
+"Jo and Lee 2017",silica/epoxy,experiment plus empirical model,measured modulus and CTE,requires matched composition before quantitative validation
+"Dittanet et al 2017",silica nanoparticle/epoxy,Kerner and Halpin-Tsai comparison,experiment,high-filler model uncertainty
+"Ito et al 2000",glass/polypropylene angle-ply,laminate and mean-field creep,experiment,elastic CTE limitations
+"2026 FR4 study",woven glass FR4,measurement and multiscale model,experiment,woven/temperature effects omitted here
