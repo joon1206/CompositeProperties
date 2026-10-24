@@ -102,8 +102,9 @@ the block solution to about 10⁻¹⁵ relative stiffness over subdivisions 1,
 flat layer, this is an assembly check, not an RVE mesh-convergence study.
 Tests also cover pure constituents, phase conservation, isotropic limits,
 stiffness symmetry/positive definiteness, elastic reciprocity, free thermal
-expansion, variational upper-bound behavior, and JAX automatic derivatives
-against centered finite differences. All 12 tests pass.
+expansion, an isotropic-layer shear benchmark, variational upper-bound
+behavior, and JAX automatic derivatives against centered finite differences.
+All 13 tests pass.
 
 The principal composition grid has 17 fiber fractions from 0.2 to 0.6 and
 29 nested silica fractions from 0 to 0.7 (493 combinations). The 512-point

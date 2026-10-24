@@ -73,3 +73,21 @@ def test_matrix_closure_limits_and_bounds():
         assert filled_matrix(p,'legacy')[2]==pytest.approx(alpha)
     assert filled_matrix(replace(Inputs(),phi=0),'mori_tanaka')==pytest.approx((2.5,.37,50))
     assert filled_matrix(replace(Inputs(),phi=1),'mori_tanaka')==pytest.approx((70,.17,.5))
+
+
+def test_isotropic_layer_shear_benchmark_and_double_rotation():
+    def iso(e,nu):
+        g=e/(2*(1+nu));lam=e*nu/((1+nu)*(1-2*nu))
+        c=np.zeros((6,6));c[:3,:3]=lam;c[np.diag_indices(3)]=lam+2*g
+        c[3,3]=c[4,4]=c[5,5]=g
+        return c,g
+    c0,g0=iso(3,.35);c1,g1=iso(70,.17)
+    a0=np.array([50.,50.,50.,0.,0.,0.]);a1=np.array([.5,.5,.5,0.,0.,0.])
+    ce,ae=exact_layers([(.4,c0,a0),(.6,c1,a1)])
+    assert ce[5,5]==pytest.approx(1/(.4/g0+.6/g1))
+    assert ce[4,4]==pytest.approx(.4*g0+.6*g1)
+    assert np.linalg.eigvalsh(ce).min()>0
+    p=Inputs();c,a,_=ply(p)
+    cr,ar=rotated_cross_ply(c,a);crr,arr=rotated_cross_ply(cr,ar)
+    np.testing.assert_allclose(crr,c)
+    np.testing.assert_allclose(arr,a)

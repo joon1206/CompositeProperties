@@ -1,7 +1,7 @@
 {
   "iterations": 1000,
-  "seconds": 0.4483810999954585,
-  "microseconds_per_evaluation": 448.3810999954585,
+  "seconds": 0.36587839999992866,
+  "microseconds_per_evaluation": 365.87839999992866,
   "cpu": "AMD64 Family 25 Model 33 Stepping 2, AuthenticAMD",
   "python": "3.14.0",
   "numpy": "2.3.3"

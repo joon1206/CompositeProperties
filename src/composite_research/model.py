@@ -2,7 +2,8 @@
 
 Engineering Voigt order: xx, yy, zz, yz, xz, xy. Engineering shear strain
 is gamma_ij=2 epsilon_ij. Y is the laminate normal; X and Z are in-plane.
-All stiffnesses are GPa, CTEs ppm/K, fractions dimensionless.
+All stiffnesses are GPa, CTEs ppm/K, densities g/cm^3, and fractions
+dimensionless.
 """
 from __future__ import annotations
 

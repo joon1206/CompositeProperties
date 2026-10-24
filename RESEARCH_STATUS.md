@@ -3,7 +3,7 @@
 Completed: source and hardware audit; 32 Crossref-verified scholarly records;
 four explicit novelty reviews; exact flat-layer and independent numerical
 reference; alternative particulate closure and Hashin–Shtrikman bounds;
-12 passing tests; 493-case grid, 512-case scenario sweep, 17 root searches;
+13 passing tests; 493-case grid, 512-case scenario sweep, 17 root searches;
 JAX x64 derivative checks and synchronized CPU batch benchmark; report,
 figures, source manuscript and reproducibility record.
 

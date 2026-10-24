@@ -4,7 +4,7 @@ Run only to refresh metadata; review notes are maintained separately. No
 paper-level scientific claims are inferred from bibliographic metadata.
 """
 from pathlib import Path
-import csv,json,re,time,urllib.parse,urllib.request
+import csv,html,json,re,time,urllib.parse,urllib.request
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'research'/'literature'
@@ -71,6 +71,36 @@ NOTES={
  DOIS[31]:('bimodal silica / epoxy','experimental filler morphology','Challenges monodisperse packing assumption'),
 }
 
+FINDINGS={
+ DOIS[0]:'Derives exact effective thermoelastic layer formulas under interface continuity',
+ DOIS[1]:'Reports 3D finite-element agreement with exact sublaminate formulas',
+ DOIS[3]:'Reported effective CTE less sensitive than local thermal stress to studied viscoelasticity and particle arrangement',
+ DOIS[4]:'At 70 wt% silica reported E increase about 51-55% and CTE reduction about 25% versus its baseline',
+ DOIS[5]:'At 8.74 vol% silica nanofiber reported about 40% CTE reduction versus neat epoxy',
+ DOIS[6]:'Reported measured angle-ply CTE mismatch with simple elastic prediction and analysis including creep',
+ DOIS[7]:'Measured temperature-dependent FR4 thermal properties and used multiscale modeling',
+ DOIS[9]:'Derived energy-principle bounds and special exact composite CTE cases',
+ DOIS[11]:'Derived variational elastic bounds for multiphase materials',
+ DOIS[12]:'Derived elastic and thermoelastic effective-medium relations for spherical grains',
+ DOIS[26]:'Computed characteristic monodisperse random close packing near volume fraction 0.64',
+ DOIS[27]:'Reported particle-shape effects on silica/epoxy mechanical properties',
+ DOIS[28]:'Reported slight Kerner/Halpin-Tsai deviation at high filler weight fraction',
+ DOIS[31]:'Reported bimodal silica/epoxy CTE reduction with increasing nanoparticle content',
+}
+LIMITATIONS={
+ DOIS[0]:'Flat perfectly bonded linear layers; no particle-level morphology',
+ DOIS[1]:'Layer homogenization; does not identify constituent material properties',
+ DOIS[2]:'Polyimide and silica nanoparticles rather than the present illustrative resin and loading',
+ DOIS[3]:'Epoxy encapsulant particle cell, not a cross-ply laminate',
+ DOIS[4]:'Reported filler load by weight; exact resin and packing not matched to present input',
+ DOIS[5]:'Nanofiber morphology differs from assumed silica spheres',
+ DOIS[6]:'Polypropylene and angle-ply, not the present epoxy cross-ply',
+ DOIS[7]:'Woven FR4 and temperature dependence differ from constant-property unidirectional model',
+ DOIS[26]:'Ideal hard-sphere packing cannot establish manufacturability of this resin mixture',
+ DOIS[27]:'Mineral particle shapes differ from ideal spherical silica',
+ DOIS[28]:'Tested nanoparticle epoxy systems, not this three-phase laminate',
+}
+
 
 def fetch(doi):
     url='https://api.crossref.org/works/'+urllib.parse.quote(doi,safe='')
@@ -78,7 +108,11 @@ def fetch(doi):
     with urllib.request.urlopen(req,timeout=20) as f:return json.load(f)['message']
 
 
-def clean(s):return re.sub(r'<[^>]+>','',s or '').replace('\n',' ').strip()
+def clean(s):return re.sub(r'<[^>]+>','',html.unescape(s or '')).replace('\n',' ').strip()
+
+
+def tex(s):
+    return str(s).replace('&',r'\&').replace('%',r'\%').replace('#',r'\#').replace('_',r'\_')
 
 
 def main():
@@ -95,11 +129,11 @@ def main():
         rows.append({'doi':m.get('DOI',doi),'title':title,'authors':'; '.join(authors),
                      'year':date[0],'venue':venue,'url':m.get('URL','https://doi.org/'+doi),
                      'access':access,'materials':mat,'assumptions_methods':method,
-                     'validated_findings':'','limitations':'','relationship':relation,
+                     'validated_findings':FINDINGS.get(doi,''),'limitations':LIMITATIONS.get(doi,''),'relationship':relation,
                      'novelty_effect':'challenges method novelty' if i in (0,1,2) else ''})
         key='ref'+str(i+1)
         fields={'author':' and '.join(authors),'title':title,'year':date[0],'journal':venue,'doi':m.get('DOI',doi),'url':m.get('URL','https://doi.org/'+doi)}
-        bib.append('@article{'+key+',\n'+''.join(f'  {k} = {{{v}}},\n' for k,v in fields.items())+'}\n')
+        bib.append('@article{'+key+',\n'+''.join(f'  {k} = {{{tex(v)}}},\n' for k,v in fields.items())+'}\n')
         time.sleep(.08)
     with (OUT/'papers.csv').open('w',newline='',encoding='utf-8') as f:
         w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)

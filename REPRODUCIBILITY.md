@@ -1,7 +1,7 @@
 # Reproducibility record
 
 1. Install: `python -m pip install -e ".[test,jax]"` from `C:\comp_work`.
-2. Verify: `python -m pytest -q` (12 tests on the recorded run).
+2. Verify: `python -m pytest -q` (13 tests on the recorded run).
 3. Reproduce all calculations and figures:
    `python -m composite_research.experiments`.
 4. Compare `results/raw/manifest.json` with the source hash and inputs;
@@ -20,6 +20,9 @@ transversely isotropic ply approximations, and two alternative isotropic
 filled-matrix closures. No matched experimental data, full fiber/particle
 RVE, or GPU/cluster execution is claimed. Subdivision checks apply only to
 the analytically exact flat-layer constrained-energy problem.
+The LaTeX manuscript source was written and its bibliography generated, but
+no TeX compiler was installed here, so a compiled manuscript PDF was not
+verified.
 
 Raw result files: `baseline.csv`, `grid.csv`, `uncertainty.csv`,
 `uncertainty_summary.json`, `derivatives.csv`, `convergence.csv`,

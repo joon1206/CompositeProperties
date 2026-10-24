@@ -6,8 +6,8 @@
     "cpu:0"
   ],
   "batch_size": 512,
-  "compile_and_first_seconds": 0.5987716999952681,
-  "steady_median_seconds": 0.0015989999956218526,
-  "jacobian_first_seconds": 1.01721190000535,
+  "compile_and_first_seconds": 0.6273133999929996,
+  "steady_median_seconds": 0.001753899996401742,
+  "jacobian_first_seconds": 1.015764899988426,
   "max_absolute_vs_numpy": 2.842170943040401e-14
 }
