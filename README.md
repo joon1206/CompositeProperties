@@ -16,13 +16,17 @@ python -m composite_research.experiments
 ```
 
 The JAX extra is optional; the core study uses NumPy/SciPy. JAX runs on CPU
-on the tested Windows installation. Output CSV/JSON is under `results/raw`,
+on the tested Windows installation. A separate WSL2 CUDA run used the
+RTX 2080 Ti for a batched four-model extension. See the
+[executive brief](EXECUTIVE_BRIEF.md) for measured CPU/GPU speedup and the
+new model finding. Output CSV/JSON is under `results/raw`,
 figures under `results/figures`, and literature metadata and bibliography
 under `research/literature`. See [reproducibility notes](REPRODUCIBILITY.md).
 
 Key source modules: `model.py` (constituent, ply, and exact layer models),
 `reference.py` (independent constrained-energy calculation),
 `jax_model.py` (differentiable x64 mirror), and `experiments.py` (all runs).
+The accelerated study and chart scripts are in `scripts/`.
 
 The original user paste is preserved in `data/source_matlab_paste.txt` for
 traceability. The paste contains some missing multiplication operators in

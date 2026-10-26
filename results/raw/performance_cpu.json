@@ -1,0 +1,109 @@
+{
+  "backend": "cpu",
+  "jax_version": "0.12.0.1",
+  "device": "cpu:0",
+  "cpu": "AMD Ryzen 5 5600X 6-Core Processor",
+  "python": "3.14.4",
+  "outputs": [
+    "EX",
+    "EY",
+    "GXY",
+    "AX",
+    "AY"
+  ],
+  "models": [
+    "exact/legacy",
+    "voigt/legacy",
+    "legacy/legacy",
+    "exact/mori_tanaka"
+  ],
+  "timing_protocol": "median of synchronized repetitions; first call separately",
+  "batch_seed": 20261024,
+  "sizes": [
+    {
+      "n": 64,
+      "compile_and_first_seconds": 0.6182050260003962,
+      "device_resident": {
+        "median_seconds": 0.000605893000283686,
+        "min_seconds": 0.0005750239997723838,
+        "max_seconds": 0.000661487999423116,
+        "repetitions": 9
+      },
+      "host_roundtrip": {
+        "median_seconds": 0.0007031169998299447,
+        "min_seconds": 0.0006633180000790162,
+        "max_seconds": 0.0008180250006262213,
+        "repetitions": 5
+      },
+      "max_abs_vs_numpy": 2.842170943040401e-14,
+      "numpy_scalar": {
+        "median_seconds": 0.03810227299982216,
+        "min_seconds": 0.03713727200010908,
+        "max_seconds": 0.038262809999650926,
+        "repetitions": 3
+      }
+    },
+    {
+      "n": 512,
+      "compile_and_first_seconds": 0.5764266530004534,
+      "device_resident": {
+        "median_seconds": 0.003058877000512439,
+        "min_seconds": 0.0029416879997370415,
+        "max_seconds": 0.003201993999937258,
+        "repetitions": 9
+      },
+      "host_roundtrip": {
+        "median_seconds": 0.0033654630005912622,
+        "min_seconds": 0.003111365999757254,
+        "max_seconds": 0.0033875230001285672,
+        "repetitions": 5
+      },
+      "max_abs_vs_numpy": 3.552713678800501e-14,
+      "numpy_scalar": {
+        "median_seconds": 0.30683459299962124,
+        "min_seconds": 0.3056625500003065,
+        "max_seconds": 0.31295122600022296,
+        "repetitions": 3
+      }
+    },
+    {
+      "n": 2048,
+      "compile_and_first_seconds": 0.6297160100002657,
+      "device_resident": {
+        "median_seconds": 0.014975395999499597,
+        "min_seconds": 0.013960655999653682,
+        "max_seconds": 0.015752766999867163,
+        "repetitions": 9
+      },
+      "host_roundtrip": {
+        "median_seconds": 0.014321632999781286,
+        "min_seconds": 0.013479241000823095,
+        "max_seconds": 0.014585011000235681,
+        "repetitions": 5
+      },
+      "max_abs_vs_numpy": 3.552713678800501e-14,
+      "numpy_scalar": {
+        "median_seconds": 1.2208923919997687,
+        "min_seconds": 1.2163750599993364,
+        "max_seconds": 1.2938495930002318,
+        "repetitions": 3
+      }
+    },
+    {
+      "n": 8192,
+      "compile_and_first_seconds": 0.7033471350005129,
+      "device_resident": {
+        "median_seconds": 0.06989200000043638,
+        "min_seconds": 0.061308203999942634,
+        "max_seconds": 0.07334516099945176,
+        "repetitions": 9
+      },
+      "host_roundtrip": {
+        "median_seconds": 0.06957145900014439,
+        "min_seconds": 0.06294591999994736,
+        "max_seconds": 0.0715544159993442,
+        "repetitions": 5
+      }
+    }
+  ]
+}

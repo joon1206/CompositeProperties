@@ -3,7 +3,7 @@
 \usepackage{amsmath,booktabs,graphicx}
 \title{A reproducible thermoelastic audit of a glass-fiber / silica-filled polymer cross-ply}
 \author{Computational research audit}
-\date{24 October 2026}
+\date{25 October 2026}
 \begin{document}
 \maketitle
 \begin{abstract}
@@ -84,6 +84,25 @@ matrix closures is 7.04\% (5th--95th: 5.39--9.20\%), against 0.0012\%
 for consistent uniform-strain versus exact layers. The source thickness-CTE
 error changes sign as nested silica fraction rises; one root occurs between
 0.206 and 0.283 across fiber fractions 0.2--0.6.
+
+A later CUDA extension evaluated all four model variants in an 8,192-case
+scrambled-Sobol sweep with the same illustrative ranges. Median matrix-
+closure differences were 7.05\% in $E_X$ and 13.88\% in $E_Y$, whereas
+the median layer-averaging difference in $G_{XY}$ was 0.232\%. At the
+baseline, the supplied thickness-CTE formula shifts the result by
+$+0.703$ ppm/K relative to exact layers under the same matrix model;
+changing to Mori--Tanaka shifts it by $-0.625$ ppm/K. The two final model
+predictions differ by only $+0.078$ ppm/K. In 43.4\% of the 8,192
+illustrative cases, the magnitude of the final difference was at most
+0.2 ppm/K while both
+opposing components exceeded 0.5 ppm/K in magnitude. Those exploratory
+thresholds do not represent experimental tolerances.
+
+For a compiled, synchronized 8,192-case call including host transfers,
+the JAX GPU median was 16.4 ms versus 69.6 ms on JAX CPU, a 4.24-fold
+speedup on this machine. Smaller batches favored CPU; compilation cost
+roughly 0.6--1.0 s. The accelerated calculation matches the saved grid and
+512-case study to floating-point precision.
 
 \begin{figure}[h]
 \centering\includegraphics[width=\textwidth]{../results/figures/model_error_map.pdf}

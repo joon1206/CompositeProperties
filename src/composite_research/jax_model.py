@@ -15,15 +15,27 @@ def _ht(em,ei,f,xi):
     return em*(1+xi*eta*f)/(1-eta*f)
 
 
-def _ply(x):
+def _ply_detail(x, matrix_method="legacy"):
     vf,phi,ef,af,er,ar,ep,ap=x
     nf,np_,nr=.22,.17,.37
     vm=1-vf;fr=1-phi
-    em=_ht(er,ep,phi,2)
-    nm=np_*phi+nr*fr
-    num=2*(ep*(1-2*nr)-er*(1-2*np_))
-    den=2*er*fr*(1-2*np_)+ep*(2*phi*(1-2*nr)+1+nr)
-    am=ar*fr+ap*phi+(ap-ar)*phi*fr*num/den
+    if matrix_method == "legacy":
+        em=_ht(er,ep,phi,2)
+        nm=np_*phi+nr*fr
+        num=2*(ep*(1-2*nr)-er*(1-2*np_))
+        den=2*er*fr*(1-2*np_)+ep*(2*phi*(1-2*nr)+1+nr)
+        am=ar*fr+ap*phi+(ap-ar)*phi*fr*num/den
+    elif matrix_method == "mori_tanaka":
+        kr,gr=er/(3*(1-2*nr)),er/(2*(1+nr))
+        kp,gp=ep/(3*(1-2*np_)),ep/(2*(1+np_))
+        z=gr*(9*kr+8*gr)/(6*(kr+2*gr))
+        km=kr+phi*(kp-kr)/(1+fr*(kp-kr)/(kr+4*gr/3))
+        gm=gr+phi*(gp-gr)/(1+fr*(gp-gr)/(gr+z))
+        em=9*km*gm/(3*km+gm)
+        nm=(3*km-2*gm)/(2*(3*km+gm))
+        am=ap+(ar-ap)*(1/km-1/kp)/(1/kr-1/kp)
+    else:
+        raise ValueError(matrix_method)
     el=vf*ef+vm*em
     nlt=vf*nf+vm*nm
     et=_ht(em,ef,vf,2)
@@ -39,7 +51,12 @@ def _ply(x):
                [0,0,0,1/gtt,0,0],
                [0,0,0,0,1/glt,0],
                [0,0,0,0,0,1/glt]])
-    return j.linalg.solve(s,j.eye(6)),j.array([a1,a2,a2,0,0,0])
+    return j.linalg.solve(s,j.eye(6)),j.array([a1,a2,a2,0,0,0]),(el,et,nlt,ntt,a1,a2)
+
+
+def _ply(x):
+    c,a,_=_ply_detail(x)
+    return c,a
 
 
 def _reorder(c,a):
@@ -47,8 +64,14 @@ def _reorder(c,a):
     return c[idx[:,None],idx[None,:]],a[idx]
 
 
-def response(x):
-    c0,a0=_ply(x);c1,a1=_reorder(c0,a0)
+def _effective(c0,a0,method="exact"):
+    c1,a1=_reorder(c0,a0)
+    if method == "voigt":
+        ce=(c0+c1)/2
+        alpha=j.linalg.solve(ce,(c0@a0+c1@a1)/2)
+        return ce,alpha
+    if method != "exact":
+        raise ValueError(method)
     aa=j.array([0,2,4]);bb=j.array([1,3,5])
     def blocks(c,a):
         caa=c[aa[:,None],aa[None,:]]
@@ -69,9 +92,32 @@ def response(x):
     ce=cb[order[:,None],order[None,:]]
     beta=betab[order]
     alpha=j.linalg.solve(ce,beta)
+    return ce,alpha
+
+
+def _summary(ce,alpha):
     s=j.linalg.solve(ce,j.eye(6))
     return j.array([1/s[0,0],1/s[1,1],1/s[5,5],alpha[0],alpha[1]])
 
 
+def response(x):
+    c,a=_ply(x)
+    return _summary(*_effective(c,a))
+
+
+def study_response(x):
+    """[exact, consistent Voigt, supplied-script, Mori-Tanaka] x 5 outputs."""
+    c,a,(el,et,nlt,ntt,a1,a2)=_ply_detail(x)
+    ce,ae=_effective(c,a)
+    cv,av=_effective(c,a,"voigt")
+    ax=(a1*el+a2*et)/(el+et)
+    ay=a2+(ntt+nlt)*(ax-a1)
+    legacy=_summary(cv,j.array([ax,ay,ax,0.,0.,0.]))
+    cm,am,_=_ply_detail(x,"mori_tanaka")
+    return j.stack((_summary(ce,ae),_summary(cv,av),legacy,
+                    _summary(*_effective(cm,am))))
+
+
 compiled_response=jax.jit(response)
 compiled_jacobian=jax.jit(jax.jacfwd(response))
+compiled_study=jax.jit(jax.vmap(study_response))

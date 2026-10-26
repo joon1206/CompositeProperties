@@ -174,14 +174,45 @@ found; therefore none of the tabulated values is experimentally validated.
 A 3D particle/fiber RVE without identified geometry would add computation
 without resolving that lack of validation.
 
-**Computing.** JAX x64 ran on CPU. A synchronized 512-case batched JIT call
-took about 1.6 ms steady state after about 0.55 s first-call compilation on
-this machine; a NumPy full-model call took about 0.30 ms. These workloads
-are not identical and this is not a GPU speedup claim. An RTX 2080 Ti was
-detected, but the installed Windows JAX backend was CPU only. No cluster job
-or GPU run was performed.
+**Computing.** The original Windows run used JAX x64 on CPU and timed only one
+five-output model variant, so that early timing was not a GPU comparison. A
+later WSL2 CUDA run used the RTX 2080 Ti for all four study variants with x64
+arithmetic. The matched CPU/GPU measurements and validation are below. No
+cluster job was performed.
 
-## 7. Conclusion
+## 7. CUDA extension and further model audit
+
+We batched the exact, consistent uniform-strain, supplied-script, and
+Mori–Tanaka variants in JAX. The CUDA implementation matches 6,902 comparable
+values in the saved 493-point grid to at most 3.6×10⁻¹⁴ absolute difference
+and 4,608 values in the saved 512-point sweep to at most 2.9×10⁻¹⁴. A larger
+8,192-point scrambled-Sobol study used the same illustrative ranges and seed.
+Its median matrix-closure differences are 7.05% for EX and 13.88% for EY;
+the median uniform-strain GXY difference is 0.232%. The larger draw confirms
+the previously observed ranking over these ranges but does not create
+statistical confidence intervals or physical validation.
+
+An additional post-hoc diagnostic exposed cancellation in thickness CTE. At
+the baseline, the supplied scalar CTE expression exceeds the exact-layer
+result under the same filled-matrix closure by 0.703 ppm/K, while changing
+that closure from the script formula to Mori–Tanaka shifts the exact-layer
+result by −0.625 ppm/K. The supplied and Mori–Tanaka final values thus differ
+by only +0.078 ppm/K. In 43.4% of the 8,192 illustrative draws, their net
+difference is at most 0.2 ppm/K although each opposing component has
+magnitude at least 0.5 ppm/K. These exploratory thresholds were selected to
+describe a cancellation pattern; they have no measurement-tolerance meaning.
+
+For 8,192 scenarios, median synchronized host-to-host time was 69.6 ms on
+JAX CPU and 16.4 ms on the RTX 2080 Ti, a 4.24× GPU speedup for this repeated
+calculation. At 64 and 512 scenarios the CPU was faster. First-use compilation
+cost roughly 0.6–1.0 s, depending on backend and batch size. The timings
+exclude the rest of the research workflow and are machine-specific.
+
+![Measured GPU speedup](../results/figures/executive_gpu_speedup.png)
+
+![Opposing thickness-CTE model differences](../results/figures/executive_model_risk.png)
+
+## 8. Conclusion
 
 Under the selected idealizations, the most consequential modeling choice is
 the silica-filled matrix stiffness closure. The supplied cross-ply stiffness

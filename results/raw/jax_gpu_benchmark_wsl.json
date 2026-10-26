@@ -1,0 +1,13 @@
+{
+  "status": "run",
+  "jax_version": "0.12.0.1",
+  "backend": "gpu",
+  "devices": [
+    "cuda:0"
+  ],
+  "batch_size": 512,
+  "compile_and_first_seconds": 0.6078049230000033,
+  "steady_median_seconds": 0.0021604559999843786,
+  "jacobian_first_seconds": 1.0244818019999968,
+  "max_absolute_vs_numpy": 2.1316282072803006e-14
+}
