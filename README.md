@@ -33,20 +33,21 @@ traceability. The paste contains some missing multiplication operators in
 the supplied text; the present implementation reconstructs the algebra
 shown rather than claiming to have run the MATLAB file verbatim.
 
-## Package-level screening study
+## Bare-PCB thermal laminate screen
 
-The [package warpage screen](research/package_warpage_screen.md) connects the
-computed core stiffness to a reduced-order thermal plate model using the
-project deck's core, die and ring dimensions. It compares the two conflicting
-Resonac Type LH in-plane CTE ranges and sweeps the unknown effective build-up
-CTE. Its main result is that adding build-up layers can reverse the preferred
-core CTE in the no-ring case. It is a conditional sensitivity model, not a
-validated package warpage forecast.
+The [PCB study](research/pcb_warpage_screen.md) connects the computed core
+stiffness to a free multilayer board with dielectric and copper build-up on
+both faces. It has no die, package stiffener or ring. The key result is that
+a perfectly symmetric board has zero thermal bow under a uniform temperature
+change in this linear model; copper and dielectric asymmetry create bow.
+The study also shows why the core CTE alone cannot determine board warpage.
+Its numeric outputs are conditional screening values, not validated PCB
+forecasts.
 
 ```powershell
-python scripts/package_warpage_screen.py
+python scripts/pcb_warpage_screen.py
 ```
 
 Figures and raw scenario tables are saved in `results/figures` and
 `results/raw`. The plate implementation and checks are in
-`src/composite_research/package_screen.py` and `tests/test_package_screen.py`.
+`src/composite_research/pcb_laminate.py` and `tests/test_pcb_laminate.py`.
