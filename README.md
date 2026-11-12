@@ -33,21 +33,23 @@ traceability. The paste contains some missing multiplication operators in
 the supplied text; the present implementation reconstructs the algebra
 shown rather than claiming to have run the MATLAB file verbatim.
 
-## Bare-PCB thermal laminate screen
+## Woven composite material properties
 
-The [PCB study](research/pcb_warpage_screen.md) connects the computed core
-stiffness to a free multilayer board with dielectric and copper build-up on
-both faces. It has no die, package stiffener or ring. The key result is that
-a perfectly symmetric board has zero thermal bow under a uniform temperature
-change in this linear model; copper and dielectric asymmetry create bow.
-The study also shows why the core CTE alone cannot determine board warpage.
-Its numeric outputs are conditional screening values, not validated PCB
-forecasts.
+The [woven-material guide](research/woven_material_model.md) explains how to
+calculate nine elastic engineering constants and three CTEs for the
+resin/silica/glass composite itself. The orientation surrogate adds separate
+warp and weft crimp angles to the existing 0/90 model and compares two
+filled-resin descriptions. At zero crimp it reproduces the consistent
+cross-ply baseline. This is an unvalidated material screen, not a resolved
+weave unit cell.
 
 ```powershell
-python scripts/pcb_warpage_screen.py
+python scripts/woven_material_screen.py
+python scripts/material_card.py data/material_card_input_example.csv results/raw/material_card_example.csv --matrix-method mori_tanaka
 ```
 
 Figures and raw scenario tables are saved in `results/figures` and
-`results/raw`. The plate implementation and checks are in
-`src/composite_research/pcb_laminate.py` and `tests/test_pcb_laminate.py`.
+`results/raw`. The material-card tool also accepts directly measured
+filled-matrix properties; see the input template in `data/`. The model
+and checks are in `src/composite_research/woven.py`,
+`tests/test_woven.py` and `tests/test_material_card.py`.

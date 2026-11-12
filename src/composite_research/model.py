@@ -104,9 +104,15 @@ def matrix_hs_bounds(p: Inputs):
             "E_lower":young(kl,gl),"E_upper":young(ku,gu)}
 
 
-def ply(p: Inputs, matrix_method="legacy"):
+def ply(p: Inputs, matrix_method="legacy", matrix_override=None):
     """Reference script's transversely isotropic ply approximation."""
-    em, num, am = filled_matrix(p,matrix_method)
+    p.checked()
+    if matrix_override is None:
+        em, num, am = filled_matrix(p,matrix_method)
+    else:
+        em, num, am = map(float, matrix_override)
+        if em <= 0 or not -1 < num < .5:
+            raise ValueError("measured filled-matrix E/nu are invalid")
     vm = 1-p.vf
     el = p.vf*p.ef+vm*em
     nult = p.vf*p.nuf+vm*num

@@ -1,15 +1,15 @@
 # Research status
 
-## 2026-11-12 — Bare-PCB thermal laminate screen
+## 2026-11-12 — Woven composite material screen
 
-Added a no-component, no-ring PCB laminate screen using the calculated core
-stiffness and configurable top/bottom dielectric-copper build-up layers.
-The ideal symmetric board has zero thermal bow under uniform temperature
-change, while copper imbalance produces bow. A sensitivity grid shows that
-dielectric properties can change the relative bow of core-CTE scenarios.
-This is an uncalibrated screen; actual board stack-up, process history,
-temperature-dependent properties and measured bare-board shapes are needed
-for a physical prediction. See `research/pcb_warpage_screen.md`.
+Added a 3D orientation surrogate for warp and weft crimp, a two-closure
+filled-matrix comparison, and a material-card CSV tool for the nine elastic
+engineering constants and three CTEs. A direct measured filled-matrix
+route avoids estimating resin/silica properties when those measurements
+exist. In the illustrative baseline, changing filled-matrix closure shifts
+in-plane modulus more than 10° of symmetric crimp. Physical accuracy is
+unverified until filled resin, weave geometry, and matched unclad composite
+coupons are measured. See `research/woven_material_model.md`.
 
 ## 2026-10-24 — Composite model audit
 
