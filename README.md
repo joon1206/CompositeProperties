@@ -32,3 +32,21 @@ The original user paste is preserved in `data/source_matlab_paste.txt` for
 traceability. The paste contains some missing multiplication operators in
 the supplied text; the present implementation reconstructs the algebra
 shown rather than claiming to have run the MATLAB file verbatim.
+
+## Package-level screening study
+
+The [package warpage screen](research/package_warpage_screen.md) connects the
+computed core stiffness to a reduced-order thermal plate model using the
+project deck's core, die and ring dimensions. It compares the two conflicting
+Resonac Type LH in-plane CTE ranges and sweeps the unknown effective build-up
+CTE. Its main result is that adding build-up layers can reverse the preferred
+core CTE in the no-ring case. It is a conditional sensitivity model, not a
+validated package warpage forecast.
+
+```powershell
+python scripts/package_warpage_screen.py
+```
+
+Figures and raw scenario tables are saved in `results/figures` and
+`results/raw`. The plate implementation and checks are in
+`src/composite_research/package_screen.py` and `tests/test_package_screen.py`.
