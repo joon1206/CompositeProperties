@@ -72,3 +72,9 @@ python scripts/refine_inverse.py
 The FE cells and inverse screen use CPU NumPy/SciPy; they do not require
 JAX or a GPU. A resumed run can use `--reuse-inverse` and `--reuse-cells`
 to regenerate cards, figures and summary from existing CSV output.
+
+The [filled-resin model deep dive](research/matrix_model_deep_dive.md)
+compares the two existing estimates with Hashin–Shtrikman elastic and
+Levin thermal bounds. Its key correction is that the two existing
+filled-resin CTE formulas are algebraically identical. Regenerate its
+figure and table with `python scripts/matrix_model_deep_dive.py`.

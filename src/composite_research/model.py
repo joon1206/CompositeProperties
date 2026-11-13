@@ -57,8 +57,9 @@ def filled_matrix(p: Inputs, method="legacy"):
 
     'legacy' preserves the script's empirical formulas. 'mori_tanaka'
     assumes bonded spherical silica in an isotropic resin and uses the exact
-    two-phase isotropic bulk-modulus/CTE identity. Neither is experimental
-    validation, especially near high filler packing.
+    two-phase isotropic bulk-modulus/CTE identity. Their filled-resin CTE
+    formulas are algebraically identical; the closures differ in stiffness.
+    Neither is experimental validation, especially near high filler packing.
     """
     p.checked()
     q, r = p.phi, 1-p.phi
@@ -102,6 +103,25 @@ def matrix_hs_bounds(p: Inputs):
     young=lambda k,g:9*k*g/(3*k+g)
     return {"K_lower":kl,"K_upper":ku,"G_lower":gl,"G_upper":gu,
             "E_lower":young(kl,gl),"E_upper":young(ku,gu)}
+
+
+def matrix_cte_hs_bounds(p: Inputs):
+    """CTE interval implied by isotropic two-phase HS bulk-modulus bounds.
+
+    Uses the exact Levin/Rosen-Hashin cross-property relation for two
+    isotropic, perfectly bonded thermoelastic phases. This is a bound under
+    those assumptions, not a prediction for a particular particle geometry.
+    """
+    bounds = matrix_hs_bounds(p)
+    kr = p.er / (3 * (1 - 2*p.nur))
+    kp = p.ep / (3 * (1 - 2*p.nup))
+    if np.isclose(kr, kp):
+        raise ValueError("Levin relation requires distinct phase bulk moduli")
+    def cte(k):
+        return p.ap + (p.ar-p.ap)*(1/k-1/kp)/(1/kr-1/kp)
+    values = (cte(bounds["K_lower"]), cte(bounds["K_upper"]))
+    return {"CTE_lower":min(values), "CTE_upper":max(values),
+            "CTE_at_K_lower":values[0], "CTE_at_K_upper":values[1]}
 
 
 def ply(p: Inputs, matrix_method="legacy", matrix_override=None):

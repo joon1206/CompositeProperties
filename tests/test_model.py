@@ -1,7 +1,7 @@
 from dataclasses import replace
 import numpy as np
 import pytest
-from composite_research.model import Inputs, fractions, ply, rotated_cross_ply, exact_layers, voigt_layers, evaluate, filled_matrix, matrix_hs_bounds
+from composite_research.model import Inputs, fractions, ply, rotated_cross_ply, exact_layers, voigt_layers, evaluate, filled_matrix, matrix_hs_bounds, matrix_cte_hs_bounds
 from composite_research.reference import numerical_effective, constrained_response
 
 
@@ -71,6 +71,9 @@ def test_matrix_closure_limits_and_bounds():
         assert em==pytest.approx(b['E_lower'])
         assert b['E_lower']<=b['E_upper']+1e-12
         assert filled_matrix(p,'legacy')[2]==pytest.approx(alpha)
+        thermal_bounds=matrix_cte_hs_bounds(p)
+        assert thermal_bounds['CTE_lower']-1e-12<=alpha<=thermal_bounds['CTE_upper']+1e-12
+        assert thermal_bounds['CTE_at_K_lower']==pytest.approx(alpha)
     assert filled_matrix(replace(Inputs(),phi=0),'mori_tanaka')==pytest.approx((2.5,.37,50))
     assert filled_matrix(replace(Inputs(),phi=1),'mori_tanaka')==pytest.approx((70,.17,.5))
 

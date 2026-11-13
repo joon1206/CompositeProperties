@@ -69,12 +69,19 @@ calibration. The modulus window is likewise a screening assumption.
 
 The 37 broader-window rows span fiber fractions **.267–.628**, silica
 fractions **.441–.746** of nonfiber matrix, and resin moduli **1.52–4.96
-GPa**. Thus the two measured targets would not identify a unique
+GPa**. Thus the two comparison targets would not identify a unique
 composition. The matrix closure shifts in-plane modulus by a median
 **2.74 GPa** among designs meeting the broader window under one closure;
 that is larger than the **2 GPa** width of the modulus window. Confirming
 filled-resin behavior is therefore more useful than selecting a single
 composition from these 37 rows.
+
+**Model-form clarification:** the supplied and Mori–Tanaka filled-resin
+CTE equations are algebraically equivalent. They are separate stiffness
+closures, not separate thermal-expansion hypotheses for the filled resin.
+The [model deep dive](matrix_model_deep_dive.md) adds Hashin–Shtrikman
+elastic and Levin thermal bounds and explains why the empty detailed-window
+set is conditional on the two implemented closures, not a materials limit.
 
 Constrained local refinement found a best candidate with both in-plane
 moduli at **33.0 GPa** and both CTEs at **3.344 ppm/K**. It uses the original
