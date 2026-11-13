@@ -39,6 +39,8 @@ screen rather than a validated prediction. Published woven glass/epoxy
 work for circuit-board substrates measured warp and fill geometry and
 found that crimp affects directional modulus and CTE; see the
 [Illinois thermoelastic study](https://www.ideals.illinois.edu/items/120372/bitstreams/394358/data.pdf).
+The [follow-on inverse and periodic-cell study](inverse_weave_study.md)
+tests the missing geometry and silica-location assumptions explicitly.
 
 ## A useful conclusion from the current illustrative inputs
 

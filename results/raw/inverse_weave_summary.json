@@ -1,0 +1,234 @@
+{
+  "sample_count": 12288,
+  "seed": 20261113,
+  "sobol_points_per_group": 2048,
+  "bounds": {
+    "vf": [
+      0.25,
+      0.65
+    ],
+    "phi": [
+      0.25,
+      0.75
+    ],
+    "er": [
+      1.5,
+      5.0
+    ],
+    "ar": [
+      25.0,
+      65.0
+    ],
+    "ep": [
+      65.0,
+      75.0
+    ],
+    "ap": [
+      0.3,
+      0.7
+    ],
+    "warp_crimp_deg": [
+      0.0,
+      20.0
+    ],
+    "weft_crimp_deg": [
+      0.0,
+      20.0
+    ],
+    "warp_share": [
+      0.4,
+      0.6
+    ]
+  },
+  "fiber_presets": {
+    "E_glass_illustrative": [
+      76.0,
+      0.21,
+      5.6
+    ],
+    "S_glass_illustrative": [
+      87.0,
+      0.22,
+      2.8
+    ],
+    "original_fiber_illustrative": [
+      82.0,
+      0.22,
+      2.49
+    ]
+  },
+  "windows": {
+    "overview": [
+      [
+        31.0,
+        33.0
+      ],
+      [
+        4.5,
+        6.5
+      ]
+    ],
+    "detail": [
+      [
+        31.0,
+        33.0
+      ],
+      [
+        0.5,
+        3.0
+      ]
+    ]
+  },
+  "counts": {
+    "overview": {
+      "X": 165,
+      "XZ": 37
+    },
+    "detail": {
+      "X": 0,
+      "XZ": 0
+    }
+  },
+  "paired_designs_meeting_overview_under_both_matrix_models": 0,
+  "counts_by_group": {
+    "E_glass_illustrative/legacy": {
+      "overview": 1,
+      "detail": 0
+    },
+    "E_glass_illustrative/mori_tanaka": {
+      "overview": 1,
+      "detail": 0
+    },
+    "S_glass_illustrative/legacy": {
+      "overview": 7,
+      "detail": 0
+    },
+    "S_glass_illustrative/mori_tanaka": {
+      "overview": 4,
+      "detail": 0
+    },
+    "original_fiber_illustrative/legacy": {
+      "overview": 10,
+      "detail": 0
+    },
+    "original_fiber_illustrative/mori_tanaka": {
+      "overview": 14,
+      "detail": 0
+    }
+  },
+  "weave_mesh_sensitivity": [
+    {
+      "amplitude": 0.06,
+      "silica_location": "uniform",
+      "mesh_pair": "8\u219212",
+      "EX_percent_change": 1.5073143076458662,
+      "AX_percent_change": -0.6735001457058855,
+      "fiber_fraction_delta": 0.006018518518518506
+    },
+    {
+      "amplitude": 0.06,
+      "silica_location": "between_tows",
+      "mesh_pair": "8\u219212",
+      "EX_percent_change": 3.602635836055742,
+      "AX_percent_change": -3.272382411556539,
+      "fiber_fraction_delta": 0.006018518518518506
+    },
+    {
+      "amplitude": 0.06,
+      "silica_location": "inside_tows",
+      "mesh_pair": "8\u219212",
+      "EX_percent_change": -1.3836163487843196,
+      "AX_percent_change": 3.882660676216494,
+      "fiber_fraction_delta": 0.006018518518518506
+    },
+    {
+      "amplitude": 0.1,
+      "silica_location": "uniform",
+      "mesh_pair": "8\u219212",
+      "EX_percent_change": -0.4200343881833543,
+      "AX_percent_change": -0.8184876730417547,
+      "fiber_fraction_delta": 0.0015046296296296335
+    },
+    {
+      "amplitude": 0.1,
+      "silica_location": "uniform",
+      "mesh_pair": "12\u219216",
+      "EX_percent_change": -2.943672783722664,
+      "AX_percent_change": 2.009261684558203,
+      "fiber_fraction_delta": -0.011660879629629639
+    },
+    {
+      "amplitude": 0.1,
+      "silica_location": "uniform",
+      "mesh_pair": "16\u219220",
+      "EX_percent_change": -1.2225852051737,
+      "AX_percent_change": 0.4888065045548834,
+      "fiber_fraction_delta": -0.0005687500000000068
+    },
+    {
+      "amplitude": 0.1,
+      "silica_location": "between_tows",
+      "mesh_pair": "8\u219212",
+      "EX_percent_change": -1.15444073729848,
+      "AX_percent_change": -1.5970379298760855,
+      "fiber_fraction_delta": 0.0015046296296296335
+    },
+    {
+      "amplitude": 0.1,
+      "silica_location": "between_tows",
+      "mesh_pair": "12\u219216",
+      "EX_percent_change": -1.8925275485527473,
+      "AX_percent_change": 1.576114324500618,
+      "fiber_fraction_delta": -0.011660879629629639
+    },
+    {
+      "amplitude": 0.1,
+      "silica_location": "between_tows",
+      "mesh_pair": "16\u219220",
+      "EX_percent_change": -0.8490094729176481,
+      "AX_percent_change": -0.3050173852446949,
+      "fiber_fraction_delta": -0.0005687500000000068
+    },
+    {
+      "amplitude": 0.1,
+      "silica_location": "inside_tows",
+      "mesh_pair": "8\u219212",
+      "EX_percent_change": 0.4472681768601449,
+      "AX_percent_change": -0.988724177786925,
+      "fiber_fraction_delta": 0.0015046296296296335
+    },
+    {
+      "amplitude": 0.1,
+      "silica_location": "inside_tows",
+      "mesh_pair": "12\u219216",
+      "EX_percent_change": -4.132470751708682,
+      "AX_percent_change": 3.1820288302271202,
+      "fiber_fraction_delta": -0.011660879629629639
+    },
+    {
+      "amplitude": 0.1,
+      "silica_location": "inside_tows",
+      "mesh_pair": "16\u219220",
+      "EX_percent_change": -1.886934363597272,
+      "AX_percent_change": 1.717305831890681,
+      "fiber_fraction_delta": -0.0005687500000000068
+    }
+  ],
+  "card_selection": {
+    "low": {
+      "fiber": "original_fiber_illustrative",
+      "sample_id": 891,
+      "matrix_method": "mori_tanaka"
+    },
+    "central": {
+      "fiber": "S_glass_illustrative",
+      "sample_id": 1782,
+      "matrix_method": "legacy"
+    },
+    "high": {
+      "fiber": "S_glass_illustrative",
+      "sample_id": 1080,
+      "matrix_method": "mori_tanaka"
+    }
+  }
+}

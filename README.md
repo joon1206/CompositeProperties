@@ -53,3 +53,22 @@ Figures and raw scenario tables are saved in `results/figures` and
 filled-matrix properties; see the input template in `data/`. The model
 and checks are in `src/composite_research/woven.py`,
 `tests/test_woven.py` and `tests/test_material_card.py`.
+
+## Inverse design and periodic weave cells
+
+The [inverse and weave study](research/inverse_weave_study.md) searches
+illustrative composition/property assumptions backward from two in-plane
+modulus/CTE windows. It also compares the fast orientation model with
+periodic finite-element homogenization of synthetic plain-weave cells,
+including silica between or inside tows. Coherent 12-property cards at
+25, 100 and 150 °C, all sampled inputs, numerical checks and figures are
+saved under `results/`. None of these cards is a measured material.
+
+```powershell
+python scripts/inverse_weave_study.py
+python scripts/refine_inverse.py
+```
+
+The FE cells and inverse screen use CPU NumPy/SciPy; they do not require
+JAX or a GPU. A resumed run can use `--reuse-inverse` and `--reuse-cells`
+to regenerate cards, figures and summary from existing CSV output.
